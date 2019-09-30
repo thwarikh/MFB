@@ -1,5 +1,5 @@
 {
-  "name": "AnyDLBot",
+  "name": "MFB_DlBot",
   "description": "Telegram's best YouTube Downloader. Create your Fork now.",
   "keywords": [
     "telegram",
@@ -8,7 +8,7 @@
     "downloader",
     "3"
   ],
-  "repository": "https://github.com/SpEcHiDe/AnyDLBot",
+  "repository": "https://github.com/thwarikh/mfb",
   "env": {
     "WEBHOOK": {
       "description": "Setting this to ANYTHING will enable webhooks when in env mode",
