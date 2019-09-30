@@ -1,0 +1,8 @@
+requests
+youtube-dl
+git+git://github.com/google/chatbase-python.git
+pyrogram[fast]
+Pillow
+hachoir
+numpy
+ffmpeg-python
