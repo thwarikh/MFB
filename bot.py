@@ -23,10 +23,15 @@ if __name__ == "__main__" :
     # create download directory, if not exist
     if not os.path.isdir(Config.DOWNLOAD_LOCATION):
         os.makedirs(Config.DOWNLOAD_LOCATION)
+    plugins = dict(
+        root="plugins"
+    )
     app = pyrogram.Client(
-        session_name=Config.TG_BOT_TOKEN,
+        "AnyDLBot",
+        bot_token=Config.TG_BOT_TOKEN,
         api_id=Config.APP_ID,
         api_hash=Config.API_HASH,
-        plugins_dir="plugins"
+        plugins=plugins
     )
+    app.DOWNLOAD_WORKERS = 4
     app.run()
