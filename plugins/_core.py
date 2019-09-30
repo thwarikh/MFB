@@ -2,39 +2,42 @@
 # -*- coding: utf-8 -*-
 # (c) Shrimadhav U K
 
+import json
 # the logging things
 import logging
+import math
+import os
+import subprocess
+import time
+
+import requests
+
+import pyrogram 
+from hachoir.metadata import extractMetadata
+from hachoir.parser import createParser
+from helper_funcs.chat_base import TRChatBase
+from helper_funcs.display_progress import humanbytes, progress_for_pyrogram
+from helper_funcs.help_uploadbot import DetectFileSize, DownLoadFile
+# https://stackoverflow.com/a/37631799/4723940
+from PIL import Image
+# the Strings used for this "thing"
+from translation import Translation
+
 logging.basicConfig(level=logging.DEBUG,
                     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
-import json
-import math
-import os
-import requests
-import subprocess
-import time
 
 # the secret configuration specific things
 if bool(os.environ.get("WEBHOOK", False)):
     from sample_config import Config
 else:
-    from config import Config
+    from sample_config import Config
 
-# the Strings used for this "thing"
-from translation import Translation
 
-import pyrogram
 logging.getLogger("pyrogram").setLevel(logging.WARNING)
 
-from helper_funcs.chat_base import TRChatBase
-from helper_funcs.display_progress import progress_for_pyrogram, humanbytes
-from helper_funcs.help_uploadbot import DownLoadFile, DetectFileSize
 
-from hachoir.metadata import extractMetadata
-from hachoir.parser import createParser
-# https://stackoverflow.com/a/37631799/4723940
-from PIL import Image
 
 
 @pyrogram.Client.on_message(pyrogram.Filters.regex(pattern=".*http.*"))
@@ -52,7 +55,7 @@ def echo(bot, update):
             text=Translation.ABUSIVE_USERS,
             reply_to_message_id=update.message_id,
             disable_web_page_preview=True,
-            parse_mode=pyrogram.ParseMode.HTML
+            parse_mode="html"
         )
         return
     url = update.text
@@ -220,7 +223,7 @@ def echo(bot, update):
                 chat_id=update.chat.id,
                 text=Translation.FORMAT_SELECTION.format(thumbnail),
                 reply_markup=reply_markup,
-                parse_mode=pyrogram.ParseMode.HTML,
+                parse_mode="html",
                 reply_to_message_id=update.message_id
             )
     else:
@@ -240,7 +243,7 @@ def button(bot, update):
             text=Translation.ABUSIVE_USERS,
             message_id=update.message.message_id,
             disable_web_page_preview=True,
-            parse_mode=pyrogram.ParseMode.HTML
+            parse_mode="html"
         )
         return
     cb_data = update.data.decode("UTF-8")
@@ -397,6 +400,7 @@ def button(bot, update):
                 thumb_image_path = None
             # try to upload file
             if tg_send_type == "audio":
+                starts = time.time()
                 bot.send_audio(
                     chat_id=update.message.chat.id,
                     audio=download_directory,
@@ -409,9 +413,10 @@ def button(bot, update):
                     reply_to_message_id=update.message.reply_to_message.message_id,
                     progress=progress_for_pyrogram,
                     progress_args=(
-                        Translation.UPLOAD_START, update.message.message_id, update.message.chat.id)
+                        Translation.UPLOAD_START, update.message.message_id, update.message.chat.id, starts)
                 )
             elif tg_send_type == "file":
+                starts = time.time()
                 bot.send_document(
                     chat_id=update.message.chat.id,
                     document=download_directory,
@@ -421,9 +426,10 @@ def button(bot, update):
                     reply_to_message_id=update.message.reply_to_message.message_id,
                     progress=progress_for_pyrogram,
                     progress_args=(
-                        Translation.UPLOAD_START, update.message.message_id, update.message.chat.id)
+                        Translation.UPLOAD_START, update.message.message_id, update.message.chat.id, starts)
                 )
             elif tg_send_type == "vm":
+                starts = time.time()
                 bot.send_video_note(
                     chat_id=update.message.chat.id,
                     video_note=download_directory,
@@ -433,9 +439,10 @@ def button(bot, update):
                     reply_to_message_id=update.message.reply_to_message.message_id,
                     progress=progress_for_pyrogram,
                     progress_args=(
-                        Translation.UPLOAD_START, update.message.message_id, update.message.chat.id)
+                        Translation.UPLOAD_START, update.message.message_id, update.message.chat.id, starts)
                 )
             elif tg_send_type == "video":
+                starts = time.time()
                 bot.send_video(
                     chat_id=update.message.chat.id,
                     video=download_directory,
@@ -449,7 +456,7 @@ def button(bot, update):
                     reply_to_message_id=update.message.reply_to_message.message_id,
                     progress=progress_for_pyrogram,
                     progress_args=(
-                        Translation.UPLOAD_START, update.message.message_id, update.message.chat.id)
+                        Translation.UPLOAD_START, update.message.message_id, update.message.chat.i, startsd)
                 )
             else:
                 logger.info("Did this happen? :\\")
